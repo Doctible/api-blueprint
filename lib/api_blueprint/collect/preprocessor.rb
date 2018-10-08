@@ -64,7 +64,7 @@ class ApiBlueprint::Collect::Preprocessor
     requests.sort_by do |request|
       -request['response']['status']
     end.each do |request|
-      merged_params.deep_merge!(request['request']['params'])
+      merged_params.deep_merge!(request['request']['params'].except('format'))
     end
 
     merged_params = Hash[merged_params.select { |k,v| ! v.is_a?(Hash) || v.any? }]
@@ -149,7 +149,7 @@ class ApiBlueprint::Collect::Preprocessor
     if request['request']['params'].present?
       params = Hash[request['request']['params'].select { |k, v| ! v.is_a?(Hash) || v.any?}]
       params = clear_files(params)
-      request[:params] = JSON.pretty_generate(params) if params.any?
+      request[:params] = JSON.pretty_generate(params.except('format')) if params.any?
     end
 
     if request['response']['body'].is_a?(Hash)
